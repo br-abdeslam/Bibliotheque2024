@@ -21,6 +21,8 @@ public class Livre extends Ouvrage{
         this.resume=resume;
     }
 
+
+
     public String getIsbn() {
         return isbn;
     }

@@ -24,7 +24,7 @@ public class Gestion {
         Auteur a = new Auteur("Verne","Jules","France");
         laut.add(a);
 
-        Livre l = new Livre("Vingt mille lieues sous les mers",10, LocalDate.of(1880,1,1),1.50,"français","aventure","a125",350,TypeLivre.ROMAN,"histoire de sous-marin");
+        Livre l = new Livre("Vingt mille lieues sous les mers",10, LocalDate.of(1880,1,1),1.50,"français","aventure","a125",350, ROMAN,"histoire de sous-marin");
         louv.add(l);
 
         a.addOuvrage(l);
@@ -106,10 +106,56 @@ public class Gestion {
         }  while (true);
     }
 
+
+
+    private void listerOuvrage(){
+        int i=0;
+        for (Ouvrage o : louv) {
+            System.out.println((i+1)+" "+o);
+            i++;
+        }
+    }
+
     private void gestLocations() {
-//TODO lister exemplaires,lister lecteurs,créer la location avec le constructeur à deux paramètres(loueur,exemplaire)
+    //TODO lister exemplaires,lister lecteurs,créer la location avec le constructeur à deux paramètres(loueur,exemplaire
+        System.out.println("Exemplaires: ");
+        listerExemplaire();
+        System.out.println("Choisir un exemplaire : ");
+        int choixExemplaire= sc.nextInt();
+        choixExemplaire-=1;
+        System.out.println("Lecteurs: ");
+        listerLecteur();
+        System.out.println("Choisir un lecteur ");
+        int choixLecteur = sc.nextInt();
+        choixLecteur-=1;
+
+        Lecteur louer = llect.get(choixLecteur);
+
+        Exemplaire exemplaire = lex.get(choixExemplaire);
+
+        Location location = new Location(louer,exemplaire);
+
+        lloc.add(location);
 
     }
+
+    private void listerLecteur(){
+        int i=0;
+        for(Lecteur l : llect){
+            System.out.println((i+1)+". "+l);
+            i++;
+        }
+    }
+
+
+    private void listerExemplaire(){
+        int i=0;
+        for(Exemplaire e : lex){
+            System.out.println((i+1)+". "+e);
+            i++;
+        }
+    }
+
 
     private void gestLecteurs() {
 
@@ -137,22 +183,147 @@ public class Gestion {
 
     private void gestRayons() {
         //TODO gérer rayons
+
+        System.out.println("Code rayon: ");
+        String codeRayon = sc.nextLine();
+
+        System.out.println("Genre : ");
+        String genre = sc.nextLine();
+
+        Rayon rayon = new Rayon(codeRayon,genre);
+
+        lrayon.add(rayon);
     }
 
     private void gestExemplaires() {
         //TODO afficher les ouvrages et choisir par sa position dans la liste
         //TODO demander autres infos de l'exemplaire et le créer
+        listerOuvrage();
+        System.out.println("Choisir un ouvrage: ");
+        int choix=sc.nextInt();
+        choix-=1;
+        Ouvrage ouvrage = louv.get(choix);
 
+
+        System.out.println("Matricule: ");
+        String marticule = sc.nextLine();
+
+        System.out.println("Etat: ");
+        String etat = sc.nextLine();
+
+
+        Exemplaire exemplaire = new Exemplaire(marticule,etat,ouvrage);
+        lex.add(exemplaire);
+        louv.get(choix).addExemplaire(exemplaire);
+
+
+
+    }
+
+    private void afficherRayon(){
+        int i=0;
+        for(Rayon r : lrayon){
+            System.out.println((i+1)+". "+r);
+            i++;
+        }
     }
 
     private void gestOuvrages() {
         //TODO créer ouvrages
+        System.out.println("Titre: ");
+        String titre= sc.nextLine();
+        System.out.println("Age Min: ");
+        int ageMin = sc.nextInt();
+        sc.nextLine();
+
+        System.out.println("Date de parution AAAA-MM-JJ:");
+        String dateStr = sc.nextLine();
+        LocalDate date = LocalDate.parse(dateStr);
+
+        System.out.println("Type d'ouvrage (LIVRE, CD, DVD): ");
+        String typOuv = sc.nextLine().toUpperCase();
+        try {
+            TypeOuvrage to = TypeOuvrage.valueOf(typOuv);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Entrée invalide. Veuillez choisir parmi LIVRE, CD, DVD.");
+        }
+
+        System.out.println("Prix de location: ");
+        double prixLoc = sc.nextDouble();
+        sc.nextLine();
+
+        System.out.println("Langue: ");
+        String langue= sc.nextLine();
+
+        System.out.println("Genre: ");
+        String genre= sc.nextLine();
+        switch (typOuv){
+            case "LIVRE":
+                System.out.println("isbn");
+                String isbn=sc.nextLine();
+
+                System.out.println("Nombre de pages: ");
+                int nbrpages= sc.nextInt();
+                sc.nextLine();
+
+                System.out.println("Type de livre (ROMAN,NOUVELLE,ESSAI,DOCUMENTAIRE,BIOGRAPHIE): ");
+                String typLivre = sc.nextLine().toUpperCase();
+                try {
+                    TypeLivre tl = TypeLivre.valueOf(typLivre);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Entrée invalide. Veuillez choisir parmi ROMAN,NOUVELLE,ESSAI,DOCUMENTAIRE,BIOGRAPHIE.");
+                }
+
+                System.out.println("Resume: ");
+                String resume= sc.nextLine();
+
+                Livre livre = new Livre(titre,ageMin,date,prixLoc,langue,genre,isbn,nbrpages,TypeLivre.valueOf(typLivre),resume);
+                louv.add(livre);
+
+                 ;break;
+            case "CD":
+                System.out.println("Code: ");
+                Long code = sc.nextLong();
+                System.out.println("Nombre de plages: ");
+                byte nbrePlages = sc.nextByte();
+                sc.nextLine();
+                System.out.println("Duree total: ");
+                String dureeTotal= sc.nextLine();
+
+                CD cd = new CD(titre,ageMin,date,prixLoc,langue,genre,code,nbrePlages,dureeTotal);
+                louv.add(cd);
+
+                 ;break;
+            case "DVD":
+                System.out.println("Code: ");
+                Long codeDvd = sc.nextLong();
+                sc.nextLine();
+
+                System.out.println("Duree totale: ");
+                String dureeT = sc.nextLine();
+
+                System.out.println("Nombre de bonus: ");
+                byte nbrBonus = sc.nextByte();
+
+                DVD dvd = new DVD(titre,ageMin,date,prixLoc,langue,genre,codeDvd,dureeT,nbrBonus);
+                louv.add(dvd);
+                 ;break;
+        }
 
     }
 
-    private void gestAuteurs() {
-        //TODO créer auteur
 
+    private void gestAuteurs() {
+        System.out.println("Entrez les infos de l'auteur: ");
+        System.out.println("Nom : ");
+        String nom= sc.nextLine();
+        System.out.println("Prenom : ");
+        String prenom = sc.nextLine();
+        System.out.println("Nationalité");
+        String nationalite = sc.nextLine();
+        Auteur auteur = new Auteur(nom,prenom,nationalite);
+        laut.add(auteur);
+        System.out.println("l'auteur créé");
     }
 
     public static void main(String[] args) {
