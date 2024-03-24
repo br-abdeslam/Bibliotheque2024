@@ -119,11 +119,27 @@ public class Lecteur {
 
     public List<Exemplaire> listerExemplairesEnLocation(){
         //TODO lister exemplaires en location lecteur
-        return null;
+        List<Exemplaire> exemplairesEnLocation = new ArrayList<>();
+
+        for (Location location : lloc) {
+            // Vérifie si la location est toujours active (date de restitution est null ou dans le futur)
+            if (location.getDateRestitution() == null || LocalDate.now().isBefore(location.getDateRestitution())) {
+                exemplairesEnLocation.add(location.getExemplaire());
+            }
+        }
+
+        return exemplairesEnLocation;
     }
 
     public List<Exemplaire> listerExemplairesEnLoues(){
         //TODO lister exemplaires loues lecteur
-        return null;
+        List<Exemplaire> exemplairesLoues = new ArrayList<>();
+
+        for (Location location : lloc) {
+            // Ajouter chaque exemplaire associé à chaque location dans la liste
+            exemplairesLoues.add(location.getExemplaire());
+        }
+
+        return exemplairesLoues;
     }
 }

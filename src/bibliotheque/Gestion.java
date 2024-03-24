@@ -93,20 +93,60 @@ public class Gestion {
                 System.out.println("choix :");
                 choix = sc.nextInt();
                 sc.skip("\n");
-            } while(choix <1 || choix > options.size());
+            } while(choix <1 || choix > 8/**options.size()**/);
             switch (choix){
-                case 1 :gestAuteurs(); break;
+                case 1 : gestAuteurs(); break;
                 case 2 : gestOuvrages();break;
                 case 3 : gestExemplaires();break;
                 case 4 : gestRayons();break;
                 case 5 : gestLecteurs();break;
                 case 6 : gestLocations();break;
+                case 7 : listerAuteur();break;
+                case 8 : test();break;
+
+
                 default:System.exit(0);
             }
         }  while (true);
     }
 
+    private void test(){
 
+        laut.get(1).listerOuvrages(DVD);
+
+    }
+
+
+
+    private void afficherauteur(){
+        TypeOuvrage to = null;
+        int choix,i=0;
+        System.out.println("Choisir un type d'ouvrage: \n 1-LIVRE \n 2-CD \n 3-DVD ");
+        choix= sc.nextInt();
+        switch(choix){
+            case 1:to=LIVRE;break;
+            case 2:to=CD;break;
+            case 3:to=DVD;break;
+            default:
+                System.out.println("Choix invalide ");
+        }
+        System.out.println("Voici toutes les ouvrage de type "+to);
+        for(Ouvrage o : louv){
+            if (o.getTo().equals(to)){
+                System.out.println((i+1)+" "+o);
+                i++;
+            }
+        }
+
+    }
+
+    private void listerAuteur(){
+        int i=0;
+        for(Auteur a : laut){
+            System.out.println((i+1)+". "+a.getLouvrage());
+            i++;
+        }
+    }
 
     private void listerOuvrage(){
         int i=0;
@@ -147,7 +187,6 @@ public class Gestion {
         }
     }
 
-
     private void listerExemplaire(){
         int i=0;
         for(Exemplaire e : lex){
@@ -155,7 +194,6 @@ public class Gestion {
             i++;
         }
     }
-
 
     private void gestLecteurs() {
 
@@ -240,6 +278,18 @@ public class Gestion {
         String dateStr = sc.nextLine();
         LocalDate date = LocalDate.parse(dateStr);
 
+        System.out.println("Auteur: ");
+        int i=0,choix;
+        for(Auteur a : laut){
+            System.out.println((i+1)+". "+ a.getNom() +" "+a.getPrenom());
+            i++;
+        }
+        System.out.println("choix: ");
+        choix=sc.nextInt();
+        choix-=1;
+        sc.nextLine();
+
+
         System.out.println("Type d'ouvrage (LIVRE, CD, DVD): ");
         String typOuv = sc.nextLine().toUpperCase();
         try {
@@ -278,7 +328,10 @@ public class Gestion {
                 String resume= sc.nextLine();
 
                 Livre livre = new Livre(titre,ageMin,date,prixLoc,langue,genre,isbn,nbrpages,TypeLivre.valueOf(typLivre),resume);
+                livre.getLauteurs().add(laut.get(choix));
                 louv.add(livre);
+                laut.get(choix).addOuvrage(livre);
+
 
                  ;break;
             case "CD":
@@ -291,7 +344,9 @@ public class Gestion {
                 String dureeTotal= sc.nextLine();
 
                 CD cd = new CD(titre,ageMin,date,prixLoc,langue,genre,code,nbrePlages,dureeTotal);
+                cd.getLauteurs().add(laut.get(choix));
                 louv.add(cd);
+                laut.get(choix).addOuvrage(cd);
 
                  ;break;
             case "DVD":
@@ -306,12 +361,13 @@ public class Gestion {
                 byte nbrBonus = sc.nextByte();
 
                 DVD dvd = new DVD(titre,ageMin,date,prixLoc,langue,genre,codeDvd,dureeT,nbrBonus);
+                dvd.getLauteurs().add(laut.get(choix));
                 louv.add(dvd);
+                laut.get(choix).addOuvrage(dvd);
                  ;break;
         }
 
     }
-
 
     private void gestAuteurs() {
         System.out.println("Entrez les infos de l'auteur: ");

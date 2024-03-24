@@ -85,19 +85,46 @@ public class Auteur {
 
     public List<Ouvrage> listerOuvrages(){
         //TODO lister ouvrages
-        return null;
+        List<Ouvrage> ouvragesListe = new ArrayList<>();
+        int i=0;
+        for (Ouvrage o : louvrage) {
+            ouvragesListe.add(o);
+        }
+        return ouvragesListe;
     }
 
     public List<Ouvrage> listerOuvrages(TypeOuvrage to){
         //TODO lister ouvrages d'un type
-        return null;
+        List<Ouvrage> ouvragesFiltres = new ArrayList<>();
+        for (Ouvrage o : louvrage) {
+            if(o.to.equals(to)) {
+                ouvragesFiltres.add(o);
+            }
+        }
+        return ouvragesFiltres;
     }
     public List<Livre> listerLivres(TypeLivre tl){
         //TODO lister livres d'un type
-        return null;
+        List<Livre> livreList = new ArrayList<>();
+        for (Ouvrage o : louvrage){
+            if(o instanceof Livre){
+                Livre livre = (Livre) o;
+                if(livre.getTl().equals(tl)){
+                    livreList.add(livre);
+                }
+            }
+        }
+        return livreList;
     }
     public List<Ouvrage> listerOuvrages(String genre){
         //TODO lister ouvrages d'un genre
-        return null;
+        List<Ouvrage> ouvragesDuGenre = new ArrayList<>();
+        for (Ouvrage o : louvrage) {
+            if (o.getGenre().equalsIgnoreCase(genre)) {
+                ouvragesDuGenre.add(o);
+            }
+        }
+
+        return ouvragesDuGenre;
     }
 }
