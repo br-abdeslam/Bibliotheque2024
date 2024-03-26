@@ -1,8 +1,10 @@
 package bibliotheque.metier;
 
 import java.time.LocalDate;
-import java.time.Period;
-import java.util.*;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Exemplaire {
 
@@ -12,13 +14,17 @@ public class Exemplaire {
     private Ouvrage ouvrage;
     private Rayon rayon;
 
+    private String etat;
+
+
     private List<Location> lloc= new ArrayList<>();
 
 
-    public Exemplaire(String matricule, String descriptionEtat,Ouvrage ouvrage) {
+    public Exemplaire(String matricule, String descriptionEtat,Ouvrage ouvrage){
         this.matricule = matricule;
         this.descriptionEtat=descriptionEtat;
         this.ouvrage = ouvrage;
+
         this.ouvrage.getLex().add(this);
     }
 
@@ -56,7 +62,9 @@ public class Exemplaire {
     }
 
     public void setOuvrage(Ouvrage ouvrage) {
+        if(this.ouvrage!=null) this.ouvrage.getLex().remove(this);
         this.ouvrage = ouvrage;
+        this.ouvrage.getLex().add(this);
     }
 
     public Rayon getRayon() {
@@ -88,133 +96,61 @@ public class Exemplaire {
     }
 
     public void modifierEtat(String etat){
-        //TODO modifier etat exemplaire
-        System.out.println("l'état ancienne de l'exemplaire: "+this.descriptionEtat);
-        this.descriptionEtat=etat;
-        System.out.println("l'état actuelle de l'exemplaire: "+this.descriptionEtat);
-
+        setDescriptionEtat(etat);
     }
 
     public Lecteur lecteurActuel(){
-        //TODO lecteur actuel exemplaire
-       Lecteur lecteur;
-       int size;
-       size= lloc.size();
-       size-=1;
-       lecteur= lloc.get(size).getLoueur();
-        return lecteur;
+        if(enLocation()) return lloc.get(lloc.size()-1).getLoueur();
+        return null;
     }
     public List<Lecteur> lecteurs(){
-        //TODO lecteurs exemplaire
-        List<Lecteur> lecteursList = new ArrayList<>();
-        for (Location loc : lloc){
-            if(!lecteursList.contains(loc.getLoueur())){
-                lecteursList.add(loc.getLoueur());
-            }
+        List<Lecteur> ll = new ArrayList<>();
+        for(Location l : lloc){
+            if(ll.contains(l)) continue; //par la suite utiliser set
+            ll.add(l.getLoueur());
         }
-        return lecteursList;
+        return null;
     }
 
     public void envoiMailLecteurActuel(Mail mail){
-        //TODO envoi mail lecteur exemplaire
-        Lecteur lecteurActuel = lecteurActuel();
-        if (lecteurActuel != null) {
-            System.out.println("Envoi de mail à : " + lecteurActuel.getMail());
-            System.out.println("Objet : " + mail.getObjet());
-            System.out.println("Message : " + mail.getMessage());
-            System.out.println("Date d'envoi : " + mail.getDateEnvoi());
-        } else {
-            System.out.println("Aucun lecteur actuel pour cet exemplaire.");
-        }
+        if(lecteurActuel()!=null) System.out.println("envoi de "+mail+ " à "+lecteurActuel().getMail());
+        else System.out.println("aucune location en cours");
     }
     public void envoiMailLecteurs(Mail mail){
-        //TODO envoi mail lecteurs exemplaire
-        //Liste pour éviter d'envoyer plusieurs mails au même lecteur
-        Set<Lecteur> lecteursUniques = new HashSet<>();
-
-        // Ajouter tous les lecteurs qui ont loué cet exemplaire à l'ensemble
-        for (Location location : lloc) {
-            lecteursUniques.add(location.getLoueur());
+        List<Lecteur>ll=lecteurs();
+        if(ll.isEmpty()){
+            System.out.println("aucun lecteur enregistré");
         }
-
-        // Simuler l'envoi d'un mail à chaque lecteur unique
-        for (Lecteur lecteur : lecteursUniques) {
-            System.out.println("Envoi de mail à : " + lecteur.getMail());
-            System.out.println("Objet : " + mail.getObjet());
-            System.out.println("Message : " + mail.getMessage());
-            System.out.println("Date d'envoi : " + mail.getDateEnvoi());
-            System.out.println("----");
+        else{
+            for(Lecteur l: ll){
+                System.out.println("envoi de "+mail+ " à "+l.getMail());
+            }
         }
     }
 
-    public boolean enRetard(){
-        //TODO enretard exemplaire
-        if (lloc.isEmpty()) {
-            // S'il n'y a pas de locations, l'exemplaire ne peut pas être en retard
-            return false;
-        }
-
-        // Obtenir la dernière location de l'exemplaire
-        Location derniereLocation = lloc.get(lloc.size() - 1);
-        LocalDate dateRetourPrevue = null;
-
-        // Calculer la date de retour prévue en fonction du type de l'ouvrage
-        if (ouvrage instanceof Livre) {
-            dateRetourPrevue = derniereLocation.getDateLocation().plusDays(15);
-        } else if (ouvrage instanceof DVD) {
-            dateRetourPrevue = derniereLocation.getDateLocation().plusDays(3);
-        } else if (ouvrage instanceof CD) {
-            dateRetourPrevue = derniereLocation.getDateLocation().plusDays(7);
-        }
-
-        // Vérifier si la date actuelle est après la date de retour prévue
-        return dateRetourPrevue != null && LocalDate.now().isAfter(dateRetourPrevue);
-
+    public boolean enRetard(){ //par retard on entend pas encore restitué et en retard
+        if(lloc.isEmpty()) return false;
+        Location l = lloc.get(lloc.size()-1); //la location en cours est la dernière  de la liste, sauf si elle est terminée
+        if(l.getDateRestitution()==null && l.getDateLocation().plusDays(ouvrage.njlocmax()).isAfter(LocalDate.now())) return true;
+        return false;
     }
 
     public int joursRetard(){
-        //TODO jours retard exemplaire
-        if (lloc.isEmpty()) {
-            // S'il n'y a pas de locations, il n'y a pas de retard
-            return 0;
-        }
-
-        // Obtenir la dernière location
-        Location derniereLocation = lloc.get(lloc.size() - 1);
-        LocalDate dateRetourPrevue = null;
-
-        // Calculer la date de retour prévue en fonction du type d'ouvrage
-        if (ouvrage instanceof Livre) {
-            dateRetourPrevue = derniereLocation.getDateLocation().plusDays(15);
-        } else if (ouvrage instanceof DVD) {
-            dateRetourPrevue = derniereLocation.getDateLocation().plusDays(3);
-        } else if (ouvrage instanceof CD) {
-            dateRetourPrevue = derniereLocation.getDateLocation().plusDays(7);
-        }
-
-        // Si la date de restitution est passée, calculer les jours de retard
-        if (dateRetourPrevue != null && LocalDate.now().isAfter(dateRetourPrevue)) {
-            return Period.between(dateRetourPrevue, LocalDate.now()).getDays();
-        }
-
-        // Aucun retard si la date de restitution n'est pas passée
-        return 0;
+        if(!enRetard()) return 0;
+        Location l = lloc.get(lloc.size()-1);//la location en cours est la dernière de la liste
+        LocalDate dateLim = l.getDateLocation().plusDays(ouvrage.njlocmax());
+        int njretard = (int)ChronoUnit.DAYS.between(dateLim, LocalDate.now());
+        return njretard;
     }
 
 
     public boolean enLocation(){
-        //TODO en location exemplaires
-        if (lloc.isEmpty()) {
-            // Si la liste des locations est vide, l'exemplaire n'est pas en location
-            return false;
-        }
-
-        // Obtenir la dernière location de l'exemplaire
-        Location derniereLocation = lloc.get(lloc.size() - 1);
-
-        // Vérifier si la date de restitution est nulle ou dans le futur
-        return derniereLocation.getDateRestitution() == null || LocalDate.now().isBefore(derniereLocation.getDateRestitution());
+        if(lloc.isEmpty()) return false;
+        Location l = lloc.get(lloc.size()-1);//la location en cours est la dernière de la liste
+        if(l.getDateRestitution()==null) return true;
+        return false;
     }
+
 
 
 }
