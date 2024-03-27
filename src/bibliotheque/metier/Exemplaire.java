@@ -14,8 +14,6 @@ public class Exemplaire {
     private Ouvrage ouvrage;
     private Rayon rayon;
 
-    private String etat;
-
 
     private List<Location> lloc= new ArrayList<>();
 
@@ -57,7 +55,7 @@ public class Exemplaire {
         this.descriptionEtat = descriptionEtat;
     }
 
-    public Ouvrage getOuvrage() {
+     public Ouvrage getOuvrage() {
         return ouvrage;
     }
 
@@ -96,7 +94,7 @@ public class Exemplaire {
     }
 
     public void modifierEtat(String etat){
-        setDescriptionEtat(etat);
+       setDescriptionEtat(etat);
     }
 
     public Lecteur lecteurActuel(){

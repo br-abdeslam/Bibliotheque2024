@@ -81,17 +81,17 @@ public class Location {
     }
 
     public double calculerAmende(){
-        if(dateRestitution!=null){
-            LocalDate dateLim = dateLocation.plusDays(exemplaire.getOuvrage().njlocmax());
-            if(dateRestitution.isAfter(dateLim)){
-                int njretard = (int)ChronoUnit.DAYS.between(dateLim, dateRestitution);
-                return exemplaire.getOuvrage().amendeRetard(njretard);
-            }
-        }
+         if(dateRestitution!=null){
+           LocalDate dateLim = dateLocation.plusDays(exemplaire.getOuvrage().njlocmax());
+           if(dateRestitution.isAfter(dateLim)){
+               int njretard = (int)ChronoUnit.DAYS.between(dateLim, dateRestitution);
+               return exemplaire.getOuvrage().amendeRetard(njretard);
+           }
+       }
         return 0;
     }
 
     public void enregistrerRetour(){
-        if(dateRestitution==null) dateRestitution=LocalDate.now();//test sur nul pour éviter d'enregistrer retour 2 fois
+       if(dateRestitution==null) dateRestitution=LocalDate.now();//test sur nul pour éviter d'enregistrer retour 2 fois
     }
 }
