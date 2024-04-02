@@ -14,6 +14,8 @@ public class Exemplaire {
     private Ouvrage ouvrage;
     private Rayon rayon;
 
+    private String etat;
+
 
     private List<Location> lloc= new ArrayList<>();
 
