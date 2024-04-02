@@ -255,10 +255,53 @@ public class Gestion {
         o = lof.get(choix-1).create();*/
         louv.add(o);
         System.out.println("ouvrage créé");
-         choix = choixListe(laut);
-        o.addAuteur(laut.get(choix-1));
+         //choix = choixListe(laut);
+         //o.addAuteur(laut.get(choix-1));
         //TODO attribuer auteurs par boucle, les auteur sont triés par ordre de nom et prénom,
         // ne pas proposer un auteur déjà présent dans la liste des auteurs de cet ouvrage
+
+        boolean ajouterPlus = true;
+        while (ajouterPlus) {
+            // Filtrer et trier les auteurs
+            Ouvrage finalO = o;
+            List<Auteur> auteursDisponibles = laut.stream()
+                    .filter(auteur -> !finalO.getLauteurs().contains(auteur))
+                    .sorted(Comparator.comparing(Auteur::getNom)
+                            .thenComparing(Auteur::getPrenom))
+                    .collect(Collectors.toList());
+
+            // Afficher les auteurs disponibles
+            if (auteursDisponibles.isEmpty()) {
+                System.out.println("Aucun nouvel auteur disponible pour cet ouvrage.");
+                break;
+            }
+
+            System.out.println("Sélectionnez un auteur à attribuer à l'ouvrage :");
+            for (int i = 0; i < auteursDisponibles.size(); i++) {
+                Auteur a = auteursDisponibles.get(i);
+                System.out.println((i + 1) + ". " + a.getNom() + " " + a.getPrenom());
+            }
+
+            // Lire le choix de l'utilisateur
+
+            choix = sc.nextInt();
+            sc.nextLine(); // Nettoyer le tampon
+
+            if (choix < 1 || choix > auteursDisponibles.size()) {
+                System.out.println("Choix invalide. Veuillez réessayer.");
+                continue;
+            }
+
+            // Ajouter l'auteur sélectionné à l'ouvrage
+            Auteur auteurChoisi = auteursDisponibles.get(choix - 1);
+            o.addAuteur(auteurChoisi);
+            System.out.println("Auteur ajouté à l'ouvrage.");
+
+            // Demander à l'utilisateur s'il veut ajouter un autre auteur
+            System.out.println("Voulez-vous ajouter un autre auteur à cet ouvrage ? (y/n)");
+            String reponse = sc.nextLine();
+            ajouterPlus = reponse.equalsIgnoreCase("y");
+        }
     }
 
        private void gestAuteurs() {
